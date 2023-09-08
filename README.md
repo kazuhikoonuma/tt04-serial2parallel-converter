@@ -1,5 +1,8 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/wokwi_test/badge.svg)
 
+# Serial to Parallel Converter
+![スクリーンショット 2023-09-09 025311](https://github.com/kazuhikoonuma/tt04-serial2parallel-converter/assets/24312429/334c9bbb-8cd6-45b8-9f64-57b0dc5043b4)
+
 ## How it works
 
 This project implements a serial to parallel converter tailored for efficient interfacing with systems like microcontrollers using SPI or similar communication protocols. Here's a brief overview of its operation:
