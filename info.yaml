@@ -99,7 +99,7 @@ documentation:
     - parallel data bit12 (output)
     - parallel data bit13 (output)
     - parallel data bit14 (output)
-    - data ready
+    - data ready (output)
 
 # The following fields are optional
   tag:          "test"      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,
