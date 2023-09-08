@@ -5,10 +5,10 @@ project:
 
 # If using an HDL, set wokwi_id as 0 and uncomment and list your source files here. 
 # Source files must be in ./src and you must list each source file separately
-#  source_files:        
-#    - counter.v
-#    - decoder.v
-#  top_module:  "tt_um_example"      # Put the name of your top module here, must start with "tt_um_". Make it unique by including your github username
+  source_files:        
+    - tt_um_kazuhikoonuma_top.v
+    - shift_register.v
+  top_module:  "tt_um_kazuhikoonuma_top"      # Put the name of your top module here, must start with "tt_um_". Make it unique by including your github username
 
 # How many tiles your design occupies? A single tile is about 167x108 uM.
   tiles: "1x1"    # Valid values: 1x1, 1x2, 2x2, 4x2 or 8x2
@@ -21,23 +21,59 @@ yaml_version: 4
 #
 # Here is a great example: https://github.com/davidsiaw/tt02-davidsiaw-stackcalc/blob/38c5647f83aad2aec675d566aa3d67b98f0aac81/info.yaml
 documentation: 
-  author:       ""      # Your name
-  title:        ""      # Project title
-  language:     "Wokwi" # other examples include Verilog, Amaranth, VHDL, etc
-  description:  ""      # Short description of what your project does
+  author:       "Kazuhiko Onuma"      # Your name
+  title:        "Serial2Parallel"      # Project title
+  language:     "Verilog" # other examples include Verilog, Amaranth, VHDL, etc
+  description:  "Trying tape-out through the implementation of a serial to parallel converter."      # Short description of what your project does
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
-      Explain how your project works
+    This project implements a serial to parallel converter tailored for efficient interfacing with systems like microcontrollers using SPI or similar communication protocols. Here's a brief overview of its operation:
+
+    1. **Input Reception**: The converter continuously receives serial data, bit by bit, through the `serial_data` input.
+
+    2. **Data Conversion**: 
+       - As each bit is received, it's stored in a shift register (`shift_reg`).
+       - The data is shifted with every clock pulse, making room for the next incoming bit.
+       - A counter (`bit_count`) keeps track of the number of bits received.
+
+    3. **Parallel Output**: 
+       - Once 16 bits are accumulated, the lower 15 bits are outputted as a parallel data word through the `data_out` port. This design choice is intended to enhance compatibility with systems that transmit data in 8-bit chunks, such as SPI on microcontrollers.
+       - The `data_ready` signal is asserted to indicate that the parallel data is available for reading.
+
+    The design was implemented with the aim of achieving compatibility with byte-oriented communication systems and efficient data conversion.
 
 # Instructions on how someone could test your project, include things like what buttons do what and how to set the clock if needed
   how_to_test:  |
-      Explain how to test your project
+    Testing the serial to parallel converter is straightforward. Here's a step-by-step guide:
+
+    1. **Setup**:
+       - Connect the `serial_data` input to your serial data source, such as an SPI interface of a microcontroller.
+
+    2. **Clock Configuration**:
+       - Provide a clock signal to the `serial_clock` input.
+
+    3. **Resetting the Module**:
+       - Initially, or whenever you want to reset the module, assert the `reset` signal high (1'b1). This will clear the internal shift register and reset the bit counter.
+       - De-assert the `reset` signal (set to 1'b0) to allow normal operation.
+
+    4. **Sending Serial Data**:
+       - When transmitting serial data to the module, ensure that the data is stable and ready to be sampled on the rising edge of the `serial_clock`.
+
+    5. **Reading Parallel Data**:
+       - Monitor the `data_ready` signal. When it's asserted (1'b1), it indicates that a 15-bit parallel data word is available at the `data_out` port.
+       - Read the data from the `data_out` port when `data_ready` is high.
+
+    6. **Observations**:
+       - Ensure that the parallel data on `data_out` matches the expected conversion of the serial input.
+       - Monitor the `data_ready` signal to ensure it's asserted only after every 16 bits of serial data are received.
+
+    By following these steps, you can effectively test the functionality and performance of the serial to parallel converter module.
 
 # A description of what the inputs do (e.g. red button, SPI CLK, SPI MOSI, etc).
   inputs:               
-    - none
-    - none
+    - serial clock
+    - serial data (MSB first)
     - none
     - none
     - none
@@ -46,29 +82,29 @@ documentation:
     - none
 # A description of what the outputs do (e.g. status LED, SPI MISO, etc)
   outputs:
-    - segment a
-    - segment b
-    - segment c
-    - segment d
-    - segment e
-    - segment f
-    - segment g
-    - dot
+    - parallel data bit0
+    - parallel data bit1
+    - parallel data bit2
+    - parallel data bit3
+    - parallel data bit4
+    - parallel data bit5
+    - parallel data bit6
+    - parallel data bit7
 # A description of what the bidirectional I/O pins do (e.g. I2C SDA, I2C SCL, etc)
   bidirectional:
-    - none
-    - none
-    - none
-    - none
-    - none
-    - none
-    - none
-    - none
+    - parallel data bit8 (output)
+    - parallel data bit9 (output)
+    - parallel data bit10 (output)
+    - parallel data bit11 (output)
+    - parallel data bit12 (output)
+    - parallel data bit13 (output)
+    - parallel data bit14 (output)
+    - data ready
 
 # The following fields are optional
-  tag:          ""      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,
+  tag:          "test"      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,
   external_hw:  ""      # Describe any external hardware needed
-  discord:      ""      # Your discord handle, used for communication and automatically assigning tapeout role after a submission
+  discord:      "onuma_fd3s"      # Your discord handle, used for communication and automatically assigning tapeout role after a submission
   doc_link:     ""      # URL to longer form documentation, eg the README.md in your repository
   clock_hz:     0       # Clock frequency in Hz (if required)
   picture:      ""      # relative path to a picture in your repository (must be 512kb or less)
