@@ -1,36 +1,46 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/wokwi_test/badge.svg)
 
-# What is Tiny Tapeout?
+## How it works
 
-TinyTapeout is an educational project that aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip!
+This project implements a serial to parallel converter tailored for efficient interfacing with systems like microcontrollers using SPI or similar communication protocols. Here's a brief overview of its operation:
 
-Go to https://tinytapeout.com for instructions!
+1. **Input Reception**:
+   - The converter continuously receives serial data, bit by bit, through the `serial_data` input.
 
-## How to change the Wokwi project
+2. **Data Conversion**: 
+   - As each bit is received, it's stored in a shift register (`shift_reg`).
+   - The data is shifted with every clock pulse, making room for the next incoming bit.
+   - A counter (`bit_count`) keeps track of the number of bits received.
 
-Edit the [info.yaml](info.yaml) and change the wokwi_id to match your project.
+3. **Parallel Output**: 
+   - Once 16 bits are accumulated, the lower 15 bits are outputted as a parallel data word through the `data_out` port. This design choice is intended to enhance compatibility with systems that transmit data in 8-bit chunks, such as SPI on microcontrollers.
+   - The `data_ready` signal is asserted to indicate that the parallel data is available for reading.
 
-## How to enable the GitHub actions to build the ASIC files
+The design was implemented with the aim of achieving compatibility with byte-oriented communication systems and efficient data conversion.
 
-Please see the instructions for:
+## How to test
 
-- [Enabling GitHub Actions](https://tinytapeout.com/faq/#when-i-commit-my-change-the-gds-action-isnt-running)
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
+Testing the serial to parallel converter is straightforward. Here's a step-by-step guide:
 
-## How does it work?
+1. **Setup**:
+   - Connect the `serial_data` input to your serial data source, such as an SPI interface of a microcontroller.
 
-When you edit the info.yaml to choose a different ID, the [GitHub Action](.github/workflows/gds.yaml) will fetch the digital netlist of your design from Wokwi.
+2. **Clock Configuration**:
+   - Provide a clock signal to the `serial_clock` input.
 
-After that, the action uses the open source ASIC tool called [OpenLane](https://www.zerotoasiccourse.com/terminology/openlane/) to build the files needed to fabricate an ASIC.
+3. **Resetting the Module**:
+   - Initially, or whenever you want to reset the module, assert the `reset` signal high (1'b1). This will clear the internal shift register and reset the bit counter.
+   - De-assert the `reset` signal (set to 1'b0) to allow normal operation.
 
-## Resources
+4. **Sending Serial Data**:
+   - When transmitting serial data to the module, ensure that the data is stable and ready to be sampled on the rising edge of the `serial_clock`.
 
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://discord.gg/rPK2nSjxy8)
+5. **Reading Parallel Data**:
+   - Monitor the `data_ready` signal. When it's asserted (1'b1), it indicates that a 15-bit parallel data word is available at the `data_out` port.
+   - Read the data from the `data_out` port when `data_ready` is high.
 
-## What next?
+6. **Observations**:
+   - Ensure that the parallel data on `data_out` matches the expected conversion of the serial input.
+   - Monitor the `data_ready` signal to ensure it's asserted only after every 16 bits of serial data are received.
 
-- Submit your design to the next shuttle [on the website](https://tinytapeout.com/#submit-your-design), the closing date is 8th September.
-- Share your GDS on Twitter, tag it [#tinytapeout](https://twitter.com/hashtag/tinytapeout?src=hashtag_click) and [link me](https://twitter.com/matthewvenn)!
+By following these steps, you can effectively test the functionality and performance of the serial to parallel converter module.

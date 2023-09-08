@@ -30,7 +30,8 @@ documentation:
   how_it_works: |
     This project implements a serial to parallel converter tailored for efficient interfacing with systems like microcontrollers using SPI or similar communication protocols. Here's a brief overview of its operation:
 
-    1. **Input Reception**: The converter continuously receives serial data, bit by bit, through the `serial_data` input.
+    1. **Input Reception**:
+       - The converter continuously receives serial data, bit by bit, through the `serial_data` input.
 
     2. **Data Conversion**: 
        - As each bit is received, it's stored in a shift register (`shift_reg`).
